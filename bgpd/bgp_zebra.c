@@ -1532,12 +1532,15 @@ bgp_zebra_announce (struct bgp *bgp, afi_t afi, safi_t safi,
               ifindex = info->peer->nexthop.ifp->ifindex;
 
           if (!ifindex)
-	    {
-	      if (info->peer->conf_if || info->peer->ifname)
-		ifindex = if_nametoindex (info->peer->conf_if ? info->peer->conf_if : info->peer->ifname);
-	      else if (info->peer->nexthop.ifp)
-		ifindex = info->peer->nexthop.ifp->ifindex;
-	    }
+          {
+            if (info->peer->conf_if || info->peer->ifname)
+              ifindex = if_nametoindex (info->peer->conf_if ? info->peer->conf_if : info->peer->ifname);
+            if (!ifindex)
+              ifindex = ifname2ifindex_vrf (info->peer->conf_if ? info->peer->conf_if : info->peer->ifname, bgp->vrf_id);
+          }
+          if (!ifindex && info->peer->nexthop.ifp)
+            ifindex = info->peer->nexthop.ifp->ifindex;
+
           stream_put (bgp_nexthop_buf, &nexthop, sizeof (struct in6_addr *));
           stream_put (bgp_ifindices_buf, &ifindex, sizeof (unsigned int));
           valid_nh_count++;
@@ -1571,12 +1574,15 @@ bgp_zebra_announce (struct bgp *bgp, afi_t afi, safi_t safi,
               ifindex = mpinfo->peer->nexthop.ifp->ifindex;
 
           if (!ifindex)
-	    {
-	      if (mpinfo->peer->conf_if || mpinfo->peer->ifname)
-		ifindex = ifname2ifindex (mpinfo->peer->conf_if ? mpinfo->peer->conf_if : mpinfo->peer->ifname);
-	      else if (mpinfo->peer->nexthop.ifp)
-		ifindex = mpinfo->peer->nexthop.ifp->ifindex;
-	    }
+          {
+            if (mpinfo->peer->conf_if || mpinfo->peer->ifname)
+              ifindex = ifname2ifindex (mpinfo->peer->conf_if ? mpinfo->peer->conf_if : mpinfo->peer->ifname);
+            if (!ifindex)
+              ifindex =  ifname2ifindex_vrf (mpinfo->peer->conf_if ? mpinfo->peer->conf_if : mpinfo->peer->ifname, bgp->vrf_id);
+          }
+          if (!ifindex && mpinfo->peer->nexthop.ifp)
+            ifindex = mpinfo->peer->nexthop.ifp->ifindex;
+
           if (ifindex == 0)
             continue;
 
