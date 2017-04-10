@@ -1,3 +1,10 @@
+quagga (1.0.0+cl3u9-ya2) cumulus; urgency=medium
+
+  * Move to cumulus dir
+
+ -- Fedor Zhukov <azryve@yandex-team.ru>  Sat, 8 Apr 2017 16:28:27 +0300
+
+
 quagga (1.0.0+cl3u9-ya1) jessie; urgency=medium
 
   * Fix not installed multipath routes with ipv6 vrf-lite
